@@ -18,6 +18,7 @@ class CanvasTree {
 
   drawLinkNode(ctx, pointA, pointB) {
     if (pointA && pointB) {
+      ctx.beginPath();
       ctx.strokeStyle = "#f2e8e1";
       ctx.lineWidth = 4;
       ctx.moveTo(pointA.x, pointA.y);
@@ -32,6 +33,9 @@ class CanvasTree {
     ctx.beginPath();
     ctx.arc(point.x, point.y, 20, 0, 2 * Math.PI, true);
     ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#e5d2c4';
+    ctx.stroke();
 
     ctx.fillStyle = "#f2e8e1";
     ctx.font = "20px Arial";
@@ -52,12 +56,8 @@ class CanvasTree {
     bst.addNode(4);
     bst.addNode(7);
     bst.addNode(19);
-    bst.addNode(11);
-    bst.addNode(6);
-    bst.addNode(14);
-    bst.addNode(10);
-
-    const printValue = (value) => console.log(value);
+    bst.addNode(9);
+  
 
     bst.drawLinks(bst.head, this.drawLinkNode);
     bst.drawNodes(bst.head, this.drawTreeNode);

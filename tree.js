@@ -2,6 +2,7 @@ class Tree {
   constructor(ctx) {
     this.head = null;
     this.length = 0;
+    this.levels = 0;
     this.ctx = ctx;
   }
 
@@ -17,11 +18,10 @@ class Tree {
           if (node.left) {
             node = node.left;
           } else {
-            node.left = new Node({
+            node.left = this.createNode({
               value,
-              level,
               parent: node,
-              point: this.calculatePoint(node, "left"),
+              side: "left",
             });
             found = true;
           }
@@ -29,11 +29,10 @@ class Tree {
           if (node.right) {
             node = node.right;
           } else {
-            node.right = new Node({
+            node.right = this.createNode({
               value,
-              level,
               parent: node,
-              point: this.calculatePoint(node, "right"),
+              side: "right",
             });
             found = true;
           }
@@ -53,42 +52,39 @@ class Tree {
     !exist && this.length++;
   }
 
-  inOrderTraversal(node = this.head, drawTreeNode, drawLinkNode) {
+  createNode({ value, parent, side }) {
+    const point = Util.calculatePoint(parent, side);
+    return new Node({ value, level: parent.level + 1, parent, point });
+  }
+
+  inOrderTraversal(node = this.head, callback) {
     if (node !== null) {
-      this.inOrderTraversal(node.left, drawTreeNode, drawLinkNode);
-      drawLinkNode(this.ctx, node.point, node.parent?.point);
-      drawTreeNode(this.ctx, node.point, node.value);
-      this.inOrderTraversal(node.right, drawTreeNode, drawLinkNode);
+      this.inOrderTraversal(node.left, callback);
+      callback(node.value);
+      this.inOrderTraversal(node.right, callback);
     }
   }
 
-  drawNodes(node = this.head, drawNodes){
-    if (node !== null) {
-        this.drawNodes(node.left, drawNodes);
-        drawNodes(this.ctx, node.point, node.value);
-        this.drawNodes(node.right, drawNodes);
+  drawNodes(node = this.head, drawNodes) {
+    const stack = [];
+    let current = node;
+    while (current || stack.length > 0) {
+      while (current) {
+        stack.push(current);
+        current = current.left;
       }
-  }
-
-  drawLinks(node = this.head, drawLink){
-    if (node !== null) {
-        this.drawLinks(node.left, drawLink);
-        drawLink(this.ctx, node.point, node.parent?.point);
-        this.drawLinks(node.right, drawLink);
-      }
-  }
-
-  calculatePoint(nodeParent, side) {
-    const coef = 20;
-    let x = 0;
-    let y = 0;
-    if (side === "right") {
-      x = nodeParent.point.x + 160 - coef * (nodeParent.level + 1);
-    } else {
-      x = nodeParent.point.x + -160 + coef * (nodeParent.level + 1);
+      current = stack.pop();
+      drawNodes(this.ctx, current.point, current.value);
+      current = current.right;
     }
-    y = nodeParent.point.y + 100;
-    return new Point(x, y);
+  }
+
+  drawLinks(node = this.head, drawLink) {
+    if (node !== null) {
+      this.drawLinks(node.left, drawLink);
+      drawLink(this.ctx, node.point, node.parent?.point);
+      this.drawLinks(node.right, drawLink);
+    }
   }
 }
 
