@@ -1,19 +1,7 @@
 class CanvasTree {
-  ctx;
-  elements;
-
   constructor(ctx, elements) {
     this.ctx = ctx;
     this.elements = elements;
-  }
-
-  drawShapes() {
-    this.drawLinkNode(
-      new Point(this.ctx.canvas.width / 2, 50),
-      new Point(this.ctx.canvas.width / 2 - 50, 150)
-    );
-    this.drawTreeNode(new Point(this.ctx.canvas.width / 2, 50), 6);
-    this.drawTreeNode(new Point(this.ctx.canvas.width / 2 - 50, 150), 8);
   }
 
   drawLinkNode(ctx, pointA, pointB) {
@@ -22,7 +10,10 @@ class CanvasTree {
       ctx.strokeStyle = "#f2e8e1";
       ctx.lineWidth = 4;
       ctx.moveTo(pointA.x, pointA.y);
-      ctx.lineTo(pointB.x, pointB.y);
+      ctx.lineTo(
+        pointA.x < pointB.x ? pointB.x - 12 : pointB.x + 12,
+        pointB.y + 17
+      );
       ctx.stroke();
     }
   }
@@ -34,7 +25,7 @@ class CanvasTree {
     ctx.arc(point.x, point.y, 20, 0, 2 * Math.PI, true);
     ctx.fill();
     ctx.lineWidth = 3;
-    ctx.strokeStyle = '#e5d2c4';
+    ctx.strokeStyle = "#e5d2c4";
     ctx.stroke();
 
     ctx.fillStyle = "#f2e8e1";
@@ -45,21 +36,36 @@ class CanvasTree {
     ctx.fillText(value, point.x, point.y);
   }
 
-  drawTree() {
-    const bst = new Tree(this.ctx);
-    bst.addNode(5);
-    bst.addNode(5);
-    bst.addNode(3);
-    bst.addNode(1);
-    bst.addNode(8);
-    bst.addNode(2);
-    bst.addNode(4);
-    bst.addNode(7);
-    bst.addNode(19);
-    bst.addNode(9);
-  
+  checkClickInNodes(event, nodes) {
+    for (const node of nodes) {
+      if (Util.isPointInsideCircle(event.x, event.y, node.point.x, node.point.y, 20)) {
+        return node;
+      }
+    }
+    return null;
+  }
 
-    bst.drawLinks(bst.head, this.drawLinkNode);
-    bst.drawNodes(bst.head, this.drawTreeNode);
+  drawTree() {
+    const tree = new Tree(this.ctx);
+    tree.addNode(5);
+    tree.addNode(3);
+    tree.addNode(8);
+    tree.addNode(2);
+    tree.addNode(4);
+    tree.addNode(7);
+    tree.addNode(9);
+    // for (let index = 0; index < 20; index++) {
+    //   tree.addNode(Util.randomNumber());
+    // }
+
+    tree.drawTree(this.drawTreeNode, this.drawLinkNode);
+    console.log(tree.getSubtreeValuesForValue(3));
+    this.addListeners(tree);
+  }
+
+  addListeners(tree) {
+    this.ctx.canvas.addEventListener("click", (event) => {
+      console.log(this.checkClickInNodes(event, tree.elements));;
+    });
   }
 }
