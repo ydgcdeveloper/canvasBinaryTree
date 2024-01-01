@@ -84,17 +84,25 @@ class Tree {
     }
   }
 
-  async drawTree(drawNodes, drawLinkNode) {
+  async drawTree(drawNode, drawLinkNode, animate = false, selected = null) {
     const stack = [];
     let current = this.head;
 
     while (current || stack.length > 0) {
       while (current) {
         drawLinkNode(this.ctx, current.point, current.parent?.point);
-        await Util.wait(0.3);
+        if (animate) {
+          await Util.wait(.1);
+        }
 
-        drawNodes(this.ctx, current.point, current.value);
-        await Util.wait(0.8);
+        if (selected && this.isSameNode(selected, current)) {
+          drawNode(this.ctx, current.point, current.value, '#37c40a');
+        } else {
+          drawNode(this.ctx, current.point, current.value);
+        }
+        if (animate) {
+          await Util.wait(0.4);
+        }
 
         stack.push(current);
         current = current.left;
@@ -166,6 +174,10 @@ class Tree {
     } else {
       return this.findNode(value, node.right);
     }
+  }
+
+  isSameNode(nodeA, nodeB) {
+    return nodeA.point.x === nodeB.point.x && nodeA.point.y === nodeB.point.y;
   }
 }
 

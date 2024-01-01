@@ -10,9 +10,7 @@ function drawCanvas() {
 
   var ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "#605e5e";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  
   drawTree(ctx);
 }
 
